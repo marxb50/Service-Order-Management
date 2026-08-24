@@ -97,12 +97,7 @@ export async function loginAction(
     };
 
     targetRoute = routes[usuario.tipo] || "/funcionario";
-  } catch (error: any) {
-    // IMPORTANTE: Nunca capturar o erro de redirecionamento do Next.js
-    if (error?.digest?.startsWith("NEXT_REDIRECT")) {
-      throw error;
-    }
-    
+  } catch (error: unknown) {
     console.error("Critical login error:", error);
     return { error: "Erro interno no servidor. Verifique a conexão com o banco." };
   }
@@ -156,7 +151,7 @@ export async function cadastroAction(
     });
 
     return { success: "Cadastro realizado! Aguarde aprovação do administrador." };
-  } catch (error: any) {
+  } catch (error: unknown) {
     console.error("Cadastro error:", error);
     return { error: "Falha ao realizar cadastro." };
   }

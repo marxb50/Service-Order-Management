@@ -1,36 +1,98 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# Service Order Management
 
-## Getting Started
+Sistema full-stack para registrar, acompanhar, aprovar e auditar ordens de serviço executadas em campo.
 
-First, run the development server:
+O projeto demonstra a transformação de um fluxo operacional com fotos, localização, diferentes responsáveis e conferência em uma aplicação web rastreável. Dados reais, credenciais e arquivos de produção não fazem parte deste repositório.
 
-```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
+## Fluxo operacional
+
+```text
+SELIM cria a ordem
+        ↓
+Funcionário registra início + foto + geolocalização
+        ↓
+SELIM revisa e aprova ou devolve
+        ↓
+Funcionário conclui o serviço
+        ↓
+MB confere o resultado
+        ↓
+Relatório + histórico de auditoria
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+## Capacidades
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+- autenticação com sessão HTTP-only e papéis `ADMIN`, `FUNCIONARIO`, `SELIM` e `MB`;
+- cadastro e aprovação de usuários;
+- ciclo de estados de ordens de serviço;
+- captura de localização e compressão de imagens no navegador;
+- armazenamento de mídia no Cloudinary;
+- filtros, indicadores operacionais e relatório HTML pronto para impressão;
+- log de criação, início, aprovação, rejeição, conferência e alterações administrativas;
+- validação de formulários com Zod;
+- persistência PostgreSQL com Prisma.
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+## Stack
 
-## Learn More
+- Next.js 15 e React 19
+- TypeScript
+- PostgreSQL e Prisma
+- Tailwind CSS
+- JWT com `jose`
+- bcrypt
+- Cloudinary
+- Zod
 
-To learn more about Next.js, take a look at the following resources:
+## Modelo de dados
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+O domínio principal está em [`prisma/schema.prisma`](prisma/schema.prisma):
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+- `Usuario`: identidade, papel e estado da conta;
+- `Servico`: ordem, responsável, fotos, coordenadas, datas e aprovações;
+- `Log`: trilha de auditoria;
+- `Config`: parâmetros operacionais.
 
-## Deploy on Vercel
+## Executar localmente
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+Requer Node.js 20+, PostgreSQL e uma conta Cloudinary para o fluxo completo de imagens.
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+```bash
+cp .env.example .env
+npm ci
+npx prisma migrate dev
+npx prisma db seed
+npm run dev
+```
+
+Abra `http://localhost:3000`.
+
+### Variáveis obrigatórias
+
+```env
+DATABASE_URL="postgresql://..."
+JWT_SECRET="uma-chave-aleatoria-com-pelo-menos-32-caracteres"
+NEXT_PUBLIC_CLOUDINARY_CLOUD_NAME=""
+CLOUDINARY_API_KEY=""
+CLOUDINARY_API_SECRET=""
+NEXT_PUBLIC_APP_URL="http://localhost:3000"
+SEED_ADMIN_PASSWORD="senha-local-com-12-ou-mais-caracteres"
+SEED_SELIM_PASSWORD="senha-local-com-12-ou-mais-caracteres"
+SEED_MB_PASSWORD="senha-local-com-12-ou-mais-caracteres"
+```
+
+O sistema não contém senha administrativa padrão nem rotas públicas de manutenção. Usuários iniciais para desenvolvimento devem ser criados pelo seed local e nunca reutilizados em produção.
+
+## Estrutura
+
+```text
+src/
+├── actions/              # regras e transições do domínio
+├── app/                  # páginas e rotas do Next.js
+├── components/dashboard/ # interface operacional
+└── lib/                  # autenticação, banco, mídia e utilitários
+prisma/
+├── schema.prisma
+└── seed.ts
+```
+
+Desenvolvido por [Marx Bruno](https://github.com/marxb50).

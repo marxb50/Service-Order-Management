@@ -1,11 +1,18 @@
 import { prisma } from "../src/lib/db";
 import bcrypt from "bcryptjs";
 
+function requiredSeedPassword(name: string): string {
+  const value = process.env[name];
+  if (!value || value.length < 12) {
+    throw new Error(`${name} must be configured with at least 12 characters`);
+  }
+  return value;
+}
+
 async function seed() {
   console.log("🌱 Seeding database...");
 
-  // Create admin user
-  const adminHash = await bcrypt.hash("selimparnamirim", 12);
+  const adminHash = await bcrypt.hash(requiredSeedPassword("SEED_ADMIN_PASSWORD"), 12);
   await prisma.usuario.upsert({
     where: { login: "admin@selim.com" },
     update: {
@@ -22,8 +29,7 @@ async function seed() {
     },
   });
 
-  // Create SELIM user
-  const selimHash = await bcrypt.hash("prefeitura", 12);
+  const selimHash = await bcrypt.hash(requiredSeedPassword("SEED_SELIM_PASSWORD"), 12);
   await prisma.usuario.upsert({
     where: { login: "selim" },
     update: {},
@@ -37,8 +43,7 @@ async function seed() {
     },
   });
 
-  // Create MB user
-  const mbHash = await bcrypt.hash("ordem", 12);
+  const mbHash = await bcrypt.hash(requiredSeedPassword("SEED_MB_PASSWORD"), 12);
   await prisma.usuario.upsert({
     where: { login: "mb" },
     update: {},
@@ -68,9 +73,7 @@ async function seed() {
   }
 
   console.log("✅ Seed completed!");
-  console.log("   Admin: admin@selim.com / selimparnamirim");
-  console.log("   SELIM: selim / prefeitura");
-  console.log("   MB: mb / ordem");
+  console.log("   Development users created from environment-provided passwords.");
 }
 
 seed()

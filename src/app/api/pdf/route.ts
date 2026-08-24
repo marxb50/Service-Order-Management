@@ -65,7 +65,7 @@ export async function GET() {
           <tbody>
             ${servicos
               .map(
-                (s: any) => `
+                (s) => `
               <tr>
                 <td><strong>${s.codigoInterno}</strong></td>
                 <td>${s.funcionario.nome}</td>
@@ -93,7 +93,7 @@ export async function GET() {
         "Content-Type": "text/html; charset=utf-8",
       },
     });
-  } catch (error) {
+  } catch {
     return NextResponse.json(
       { error: "Erro ao gerar relatório" },
       { status: 500 }
