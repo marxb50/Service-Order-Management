@@ -1,3 +1,5 @@
+![Service-Order-Management Preview](docs/preview.png)
+
 # Service Order Management
 
 Sistema full-stack para registrar, acompanhar, aprovar e auditar ordens de serviço executadas em campo.
